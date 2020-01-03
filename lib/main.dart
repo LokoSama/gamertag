@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:clipboard_manager/clipboard_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +32,10 @@ class GameTag {
   GameTag();
   GameTag.init(this.gameName, this.gameTag, this.gameLogo);
 
+  String toReadable()  {
+    return "Platform: " + gameName + " Nickname: " + gameTag;
+  }
+
   Map<String, dynamic> toJson() => {
         'gameName': gameName,
         'gameTag': gameTag,
@@ -57,6 +62,15 @@ class GameTagsState extends State<GameTags> {
     return Scaffold(
       appBar: AppBar(
         title: Text("My games"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.content_copy),
+            onPressed: () {
+              ClipboardManager.copyToClipBoard(_myGameTags.map((tag) => tag.toReadable()).join("\n"));
+              },
+          )
+
+        ],
       ),
       body: _buildTags(),
       floatingActionButton: FloatingActionButton(
@@ -110,6 +124,7 @@ class GameTagsState extends State<GameTags> {
         content: new Form(
           key: _formKey,
           child: new Column(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               TextFormField(
                 decoration: InputDecoration(labelText: "Enter your nickname"),
@@ -181,9 +196,9 @@ class GameTagsState extends State<GameTags> {
     return Card(
         child: ListTile(
             leading: Image(image: AssetImage("lib/assets/" + gameTag.gameLogo)),
-            title: Text(gameTag.gameName),
+            title: Text(gameTag.gameTag),
             subtitle: Text(
-              gameTag.gameTag,
+              gameTag.gameName,
               style: TextStyle(color: Colors.black),
             ),
             trailing: new IconButton(
