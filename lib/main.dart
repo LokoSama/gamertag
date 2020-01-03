@@ -21,27 +21,26 @@ class MyApp extends StatelessWidget {
 
 class GameTags extends StatefulWidget {
   @override
-    GameTagsState createState() => GameTagsState();
+  GameTagsState createState() => GameTagsState();
 }
 
 class GameTag {
   String gameName = "";
-  String gameTag ="";
-  String gameLogo ="";
+  String gameTag = "";
+  String gameLogo = "";
   GameTag();
   GameTag.init(this.gameName, this.gameTag, this.gameLogo);
 
   Map<String, dynamic> toJson() => {
-    'gameName': gameName,
-    'gameTag': gameTag,
-    'gameLogo': gameLogo,
-  };
+        'gameName': gameName,
+        'gameTag': gameTag,
+        'gameLogo': gameLogo,
+      };
 
   GameTag.fromJson(Map<String, dynamic> json)
       : gameName = json['gameName'],
         gameTag = json['gameTag'],
         gameLogo = json['gameLogo'];
-
 }
 
 class GameTagsState extends State<GameTags> {
@@ -61,7 +60,8 @@ class GameTagsState extends State<GameTags> {
       ),
       body: _buildTags(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showDialog(context: context, child: _buildCreateTagDialog()),
+        onPressed: () =>
+            showDialog(context: context, child: _buildCreateTagDialog()),
         tooltip: 'Add a new game',
         child: const Icon(Icons.add),
       ),
@@ -73,7 +73,8 @@ class GameTagsState extends State<GameTags> {
     setState(() {
       var tags = jsonDecode(prefs.get("tags"));
       print("Tags loaded : " + prefs.get("tags"));
-        _myGameTags = tags.map<GameTag>((json) => GameTag.fromJson(json)).toList();
+      _myGameTags =
+          tags.map<GameTag>((json) => GameTag.fromJson(json)).toList();
     });
   }
 
@@ -93,7 +94,8 @@ class GameTagsState extends State<GameTags> {
       GameTag(),
       GameTag.init("Steam", null, "steam.png"),
       GameTag.init("League of Legends", null, "lol.png"),
-      GameTag.init("Battle.net", null, "bnet.png")] ;
+      GameTag.init("Battle.net", null, "bnet.png")
+    ];
 
     void _submitForm() {
       final FormState form = _formKey.currentState;
@@ -101,21 +103,19 @@ class GameTagsState extends State<GameTags> {
       print(_newGameTag.gameTag);
       _myGameTags.add(_newGameTag);
       print(_myGameTags.last.gameName);
-     }
+    }
 
-     return new AlertDialog(
+    return new AlertDialog(
         title: Text("Add new game"),
         content: new Form(
           key: _formKey,
-          child: new Column(children: <Widget>[
-            TextFormField(
-              decoration: InputDecoration(
-                  labelText: "Enter your nickname"
+          child: new Column(
+            children: <Widget>[
+              TextFormField(
+                decoration: InputDecoration(labelText: "Enter your nickname"),
+                onSaved: (val) => _newGameTag.gameTag = val,
               ),
-              onSaved: (val) => _newGameTag.gameTag = val,
-            ),
-            new FormField<String>(
-              builder: (FormFieldState<String> state) {
+              new FormField<String>(builder: (FormFieldState<String> state) {
                 return InputDecorator(
                   decoration: InputDecoration(
                     icon: const Icon(Icons.gamepad),
@@ -132,69 +132,69 @@ class GameTagsState extends State<GameTags> {
                           child: new Text(game.gameName),
                         );
                       }).toList(),
-                    onChanged: (val){
+                      onChanged: (val) {
                         setState(() {
-                          var _selectedGame = platforms.firstWhere((elt) => elt.gameName == val);
+                          var _selectedGame = platforms
+                              .firstWhere((elt) => elt.gameName == val);
                           _newGameTag.gameName = _selectedGame.gameName;
                           _newGameTag.gameLogo = _selectedGame.gameLogo;
                           _game = val;
                           state.didChange(_selectedGame.gameName);
                         });
-                        },
+                      },
                     ),
                   ),
                 );
-              },
-              validator: (val) {
+              }, validator: (val) {
                 return val != '' ? null : 'Please select a color';
-              }
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: RaisedButton(
-                onPressed: () {
-                  _submitForm();
-                  _updateTags();
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-                child: Text('Submit'),
+              }),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: RaisedButton(
+                  onPressed: () {
+                    _submitForm();
+                    _updateTags();
+                    setState(() {
+                      Navigator.pop(context);
+                    });
+                  },
+                  child: Text('Submit'),
+                ),
               ),
-            ),
-          ],
+            ],
           ),
-        )
-    );
+        ));
   }
-
-
 
   Widget _buildTags() {
     List<Widget> list = new List<Widget>();
-    for (var tag in _myGameTags){
+    for (var tag in _myGameTags) {
       list.add(_buildRow(tag));
     }
-    return new ListView(children: list,
-    padding: const EdgeInsets.all(16.0),);
+    return new ListView(
+      children: list,
+      padding: const EdgeInsets.all(16.0),
+    );
   }
 
   Widget _buildRow(GameTag gameTag) {
     return Card(
-      child: ListTile(
-      leading: Image(image: AssetImage("lib/assets/" + gameTag.gameLogo))
-    ,
-        title: Text(
-        gameTag.gameName
-    ),
-      subtitle: Text(
-        gameTag.gameTag,
-        style: TextStyle(color: Colors.black),
-      ),
-      )
-    ) ;
+        child: ListTile(
+            leading: Image(image: AssetImage("lib/assets/" + gameTag.gameLogo)),
+            title: Text(gameTag.gameName),
+            subtitle: Text(
+              gameTag.gameTag,
+              style: TextStyle(color: Colors.black),
+            ),
+            trailing: new IconButton(
+              icon:
+                  Icon(Icons.delete_forever, color: Colors.black26, size: 40.0),
+              onPressed: () {
+                setState(() {
+                  _myGameTags.remove(gameTag);
+                  _updateTags();
+                });
+              },
+            )));
   }
-
-
 }
