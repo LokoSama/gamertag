@@ -56,7 +56,7 @@ class GameTagsState extends State<GameTags> {
       GameTag(),
       GameTag.init("Steam", null, "steam.png"),
       GameTag.init("League of Legends", null, "lol.png"),
-      GameTag.init("Battle.net", null, "battlennet.png")] ;
+      GameTag.init("Battle.net", null, "bnet.png")] ;
 
     void _submitForm() {
       final FormState form = _formKey.currentState;
@@ -145,7 +145,8 @@ class GameTagsState extends State<GameTags> {
   Widget _buildRow(GameTag gameTag) {
     return Card(
       child: ListTile(
-      leading: FlutterLogo(size: 72.0),
+      leading: Image(image: AssetImage("lib/assets/" + gameTag.gameLogo))
+    ,
         title: Text(
         gameTag.gameName
     ),
