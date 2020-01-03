@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
 
@@ -28,10 +31,27 @@ class GameTag {
   GameTag();
   GameTag.init(this.gameName, this.gameTag, this.gameLogo);
 
+  Map<String, dynamic> toJson() => {
+    'gameName': gameName,
+    'gameTag': gameTag,
+    'gameLogo': gameLogo,
+  };
+
+  GameTag.fromJson(Map<String, dynamic> json)
+      : gameName = json['gameName'],
+        gameTag = json['gameTag'],
+        gameLogo = json['gameLogo'];
+
 }
 
 class GameTagsState extends State<GameTags> {
-  final List<GameTag> _myGameTags = <GameTag>[];
+  List<GameTag> _myGameTags = <GameTag>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTags();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +66,23 @@ class GameTagsState extends State<GameTags> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  _loadTags() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      var tags = jsonDecode(prefs.get("tags"));
+      print("Tags loaded : " + prefs.get("tags"));
+        _myGameTags = tags.map<GameTag>((json) => GameTag.fromJson(json)).toList();
+    });
+  }
+
+  _updateTags() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs.setString("tags", jsonEncode(_myGameTags));
+      print("Tags updated : " + prefs.get("tags"));
+    });
   }
 
   Widget _buildCreateTagDialog() {
@@ -118,6 +155,7 @@ class GameTagsState extends State<GameTags> {
               child: RaisedButton(
                 onPressed: () {
                   _submitForm();
+                  _updateTags();
                   setState(() {
                     Navigator.pop(context);
                   });
