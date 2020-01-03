@@ -118,7 +118,9 @@ class GameTagsState extends State<GameTags> {
               child: RaisedButton(
                 onPressed: () {
                   _submitForm();
-                  Navigator.pop(context);
+                  setState(() {
+                    Navigator.pop(context);
+                  });
                 },
                 child: Text('Submit'),
               ),
