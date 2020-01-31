@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:clipboard_manager/clipboard_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(MyApp());
@@ -68,6 +69,12 @@ class GameTagsState extends State<GameTags> {
             onPressed: () {
               ClipboardManager.copyToClipBoard(_myGameTags.map((tag) => tag.toReadable()).join("\n"));
               },
+          ),
+          IconButton(
+            icon: Icon(Icons.add_a_photo),
+            onPressed: ( () =>
+             showDialog(context: context, child: _buildQrCodeImage())
+            ),
           )
 
         ],
@@ -98,6 +105,11 @@ class GameTagsState extends State<GameTags> {
       prefs.setString("tags", jsonEncode(_myGameTags));
       print("Tags updated : " + prefs.get("tags"));
     });
+  }
+
+  Widget _buildQrCodeImage(){
+    return new AlertDialog(content: new Column(children: <Widget>[ QrImage(data: _myGameTags.map((tag) => tag.toReadable()).join("\n"))])
+    );
   }
 
   Widget _buildCreateTagDialog() {
